@@ -57,25 +57,23 @@ run(A, B, Xmin) :-
     extremum_localization(0.001, r, A, B, Xmin, Steps),
     log_line(10),
     format('+~n'),
-    format('steps ~d', [Steps]),
-    log(Error, V),
-    log(10, Base),
-    {E =:= - V / Base },
+    format('steps ~d', [Steps]).
+
+
 
 run_errors(Id) :- 
     graphic_pred(Id, A, B),
+    open('main.dat', write, _, [alias(output)]),
     maplist(
-        \E^S^extremum_localization(0.001, r, A, B, Xmin, Steps), 
-        [0.1, 0.01, 0.001, 0.0001],
-        Steps
-    ),
-    open('main.dat', write, [alias(output)]),
-    maplist(
-        \Steps^(
+        \Error^(
+            extremum_localization(Error, r, A, B, _, Steps),
+            log(Error, V),
+            log(10, Base),
+            {E =:= - V / Base },
             sformat(S, '~d ~f~n', [Steps, E]),
-            write(output, S).
+            write(output, S)
         ), 
-        Steps
+        [0.1, 0.01, 0.001, 0.0001]
     ),
     close(output),
     !.
